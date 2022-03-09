@@ -1,0 +1,23 @@
+---
+title: "Lab 4"
+author: "Luz Rosado"
+date: '2022-03-09'
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+library(sf)
+library(terra)
+library(dplyr)
+library(spData)
+library(spDataLarge)
+data(nz, package = "spData")
+data(nz_height, package = "spData")
+
+```
+
+```{r excercise 1}
+
+```
