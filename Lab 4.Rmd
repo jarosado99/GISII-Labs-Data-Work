@@ -16,8 +16,65 @@ library(spDataLarge)
 data(nz, package = "spData")
 data(nz_height, package = "spData")
 
+elev = rast(system.file("raster/elev.tif", package = "spData"))
+grain = rast(system.file("raster/grain.tif", package = "spData"))
 ```
 
+# Excercise 1
 ```{r excercise 1}
+# Sub-setting the heights to only the Canterbury reigon
+canterbury = nz %>% filter(Name == "Canterbury")
+canterbury_height = nz_height[canterbury, ]
 
+canterbury_height
+
+# There are 70 features in canterbury, meaning that 70 of the highest points in New Zealand are in Canterbury
+```
+
+# Excercise 2
+```{r excercise 2}
+# Subsetting points outside of Canterbury
+sin_canterbury = nz %>% filter(Name != "Canterbury") %>%
+  select(c("Name", "Island"))
+sin_canterbury_heights = nz_height[sin_canterbury, ]
+
+# Joining the non canterbury heights and boundaries
+joined = st_join(sin_canterbury_heights, 
+        sin_canterbury, 
+        join = st_intersects,
+        )
+# Tibble of each area with number of height entries
+by_name = joined %>%
+  group_by(Name) %>%
+  summarise(count = n_distinct(elevation))
+
+tibble(Reigon = by_name$Name, Points = by_name$count)
+
+# West Coast has the second highest number of highest points, with 22 highest points
+```
+
+# Excercise 3
+```{r excercise 3}
+# Joining nz and nz_height
+reigonal_heights = 
+st_join(nz_height,
+        nz)
+# Grouped data fame of regional_heights
+grouped_heights = 
+  reigonal_heights %>%
+  group_by(Name) %>%
+  summarise(count = n_distinct(elevation))
+
+#Heights tibble
+tibble(Reigon = grouped_heights$Name, Points = grouped_heights$count)
+
+# Seven of New Zealand's 16 reigons contain highest points. The reigons are Canterbury, Manawatu-Wanganui, Marlborough, Otago, Southland, Waikato, and West Coast
+```
+
+#Excercise 4
+```{r excercsie 4}
+# Load dem
+dem = rast(system.file("raster/dem.tif", package = "spDataLarge"))
+
+#Reclassify heights 
 ```
