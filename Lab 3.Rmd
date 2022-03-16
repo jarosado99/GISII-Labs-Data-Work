@@ -1,0 +1,43 @@
+---
+title: "Lab 3"
+author: "Luz Rosado"
+date: '2022-03-10'
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(sf)
+library(spData)
+library(rnaturalearth)
+library(sp)
+```
+
+# Excercise 1
+1. ESRI Shape file - ESRI Shapefile is a vector fomrat that requires at least three files to 
+work properly. The .shp file stores the geometries, the .prj file stores the projection 
+inormation for the geometries, and the .shx stores the shape definitions. 
+2. GeoTIFF - Contains raster image and raster metadata. Probably one of the most popular
+ways to store raster data.
+3. ESRI FileGDB - Database file that stores the spatial and non-spatial data of a raster
+or a vector. File is created in arcgis.
+
+# Excercise 2
+read_sf() and st_read() are essentially the same and are aliases for one another.
+read_sf() however does not print information about the data source when called,
+and sf_read() returns and tibble rather than a data frame. 
+
+# Excercise 3
+
+```{r}
+cycle_hire <- st_read(system.file("misc/cycle_hire_xy.csv", package="spData"))
+```
+There is no geometry in the loaded file, so the loaded object is a data frame. 
+
+# Excercise 4
+
+```{r }
+germany_borders = ne_download(scale = 110, type = "countries", category = c("physical"), returnclass = c("sp", "sf"))
+
+write_sf(obj = world, dsn = "world.gpkg")
+```

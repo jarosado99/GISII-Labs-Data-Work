@@ -1,0 +1,68 @@
+---
+title: "Assignment 2"
+author: "Luz Rosado"
+date: '2022-03-10'
+output: html_document
+---
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(sf)
+library(tidycensus)
+census_api_key("3ab24fe64b14b6ed92575014bb8eb74ba32dc580E", install = TRUE)
+```
+# ETL Work Flow Diagram:
+![](https://github.com/jarosado99/GISII-Labs-Data-Work/blob/master/ETL%20Workflow.png?raw=true)
+
+
+# NYPD Crime Data 
+Is extracted from New York City Open Data Portal. Is a csv file of all prosecuted crimes in New York City from 2006 to the present:  
+```{r}
+# Data extraction of NYPD Crime Data
+download.file(url = "https://data.cityofnewyork.us/resource/8h9b-rp9u.csv",
+              destfile = "NYPD_Arrests_Data__Historic_.csv")
+nypd_crimes = read.csv("NYPD_Arrests_Data__Historic_.csv")
+```
+### Processing of NYPD Crime Data
+Next, we will select on the variables needed for analysis from the data set and select observations within the variable ranges for this analysis (Non-violent crimes committed between 2018-2019):
+
+```{r}
+# data subset with only necessary fields
+nypd_crimes_n = select(nypd_crimes, -c("arrest_key", "pd_cd", "pd_desc", 
+                                       "ky_cd", "law_code", 
+                                       "arrest_boro", "arrest_precinct",
+                                       "age_group", "perp_sex"))
+# format arrest_date as usable date variable
+dates = c(nypd_crimes_n$arrest_date)
+nypd_crimes_n$arrest_date = as.Date(dates, format = "%Y-%m-%d")
+nypd_crimes_n$year = format(nypd_crimes_n$arrest_date, "%Y")
+
+# select entries that fit project analysis parameters (crimes between 2018 
+#and 2019, misdemenors and violations)
+nypd_crimes_w = filter(nypd_crimes_n, year >= 2018) %>%
+  filter(law_cat_cd == "M" | law_cat_cd == "V")
+```
+
+# Census Data Wrangling
+Using the data from tidy census, the demographic data for the census boundary will be 
+processed.
+
+```{r}
+# Finding correct variables
+v20 = load_variables(2020, "pl")
+view(v20)
+
+#Selecting variables and counties
+vars = paste0(c("P1_001N", "P1_003N", ""))
+
+total_pop_10 = get_decenial(
+  geography = "tract",
+  variables = vars,
+  state = "New York",
+  county = counties,
+  year = 2010
+  
+)
+
+```
+
